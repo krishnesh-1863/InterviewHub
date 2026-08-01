@@ -2,6 +2,7 @@ import "./config/env.js";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import runRoutes from "./routes/run.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import problemRoutes from "./routes/problem.routes.js";
@@ -23,6 +24,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemRoutes);
+app.use("/api/run", runRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.get("/", (req, res) => {
   res.json({
@@ -30,6 +32,8 @@ app.get("/", (req, res) => {
     message: "InterviewHub API Running",
   });
 });
+
+
 
 app.use(errorHandler);
 

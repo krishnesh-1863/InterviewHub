@@ -3,9 +3,21 @@ import slugify from "slugify";
 
 const exampleSchema = new mongoose.Schema(
   {
-    input: String,
-    output: String,
-    explanation: String,
+    input: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    output: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    explanation: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   { _id: false }
 );
@@ -15,14 +27,14 @@ const testCaseSchema = new mongoose.Schema(
     input: {
       type: String,
       required: true,
+      trim: true,
     },
-
     output: {
       type: String,
       required: true,
+      trim: true,
     },
-
-    hidden: {
+    isHidden: {
       type: Boolean,
       default: false,
     },
@@ -35,8 +47,8 @@ const starterCodeSchema = new mongoose.Schema(
     language: {
       type: String,
       required: true,
+      trim: true,
     },
-
     code: {
       type: String,
       required: true,
@@ -51,16 +63,20 @@ const problemSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
+
     slug: {
-    type: String,
-    unique: true,
-    required: true
+      type: String,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
 
     description: {
       type: String,
       required: true,
+      trim: true,
     },
 
     difficulty: {
@@ -72,12 +88,14 @@ const problemSchema = new mongoose.Schema(
     tags: [
       {
         type: String,
+        trim: true,
       },
     ],
 
     constraints: [
       {
         type: String,
+        trim: true,
       },
     ],
 
@@ -90,12 +108,28 @@ const problemSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Auto generate slug
+problemSchema.pre("validate", function () {
+  if (this.title) {
+    this.slug = slugify(this.title, {
+      lower: true,
+      strict: true,
+      trim: true,
+    });
+  }
+});
+
+// Indexes
+problemSchema.index({ difficulty: 1 });
+problemSchema.index({ tags: 1 });
 
 const Problem = mongoose.model("Problem", problemSchema);
 
