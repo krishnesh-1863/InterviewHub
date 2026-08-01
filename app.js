@@ -2,7 +2,7 @@ import "./config/env.js";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import submissionRoutes from "./routes/submission.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import problemRoutes from "./routes/problem.routes.js";
 import errorHandler from "./middlewares/error.middleware.js";
@@ -23,7 +23,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemRoutes);
-
+app.use("/api/submissions", submissionRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
