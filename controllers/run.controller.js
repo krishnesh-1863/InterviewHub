@@ -2,18 +2,18 @@ import { runCode } from "../services/judge0.service.js";
 
 export const runCodeController = async (req, res) => {
   try {
-    const { source_code, language_id, stdin = "" } = req.body;
+    const { sourceCode, languageId, stdin } = req.body;
 
-    if (!source_code || !language_id) {
+    if (!sourceCode || !languageId) {
       return res.status(400).json({
         success: false,
-        message: "Source code and language_id are required",
+        message: "Source code and language id are required",
       });
     }
 
     const result = await runCode(
-      source_code,
-      language_id,
+      sourceCode,
+      languageId,
       stdin
     );
 
@@ -27,7 +27,7 @@ export const runCodeController = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: error.response?.data?.message || error.message,
+      message: error.message,
     });
   }
 };

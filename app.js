@@ -7,6 +7,9 @@ import submissionRoutes from "./routes/submission.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import problemRoutes from "./routes/problem.routes.js";
 import errorHandler from "./middlewares/error.middleware.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+import leaderboardRoutes from "./routes/leaderboard.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
 
 const app = express();
 
@@ -26,6 +29,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/run", runRoutes);
 app.use("/api/submissions", submissionRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
+app.use("/api/profile", profileRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,

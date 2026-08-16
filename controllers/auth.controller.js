@@ -1,10 +1,14 @@
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
-
+import { OAuth2Client } from "google-auth-library";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
+
+const googleClient = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID
+);
 
 export const register = asyncHandler(async (req, res) => {
 
@@ -127,4 +131,95 @@ export const getMe = asyncHandler(async (req, res) => {
 
     );
 
+});
+
+export const googleLogin = asyncHandler(async (req, res) => {
+
+  const { credential } = req.body;
+
+  if (!credential) {
+    throw new ApiError(400, "Google credential is required");
+  }
+
+  const ticket = await googleClient.verifyIdToken({
+    idToken: credential,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload) {
+    throw new ApiError(401, "Invalid Google token");
+  }
+
+  const {
+    sub: googleId,
+    email,
+    name,
+    picture,
+  } = payload;
+
+  if (!email) {
+    throw new ApiError(
+      400,
+      "Google account email not available"
+    );
+  }
+
+  let user = await User.findOne({ googleId });
+
+  // Google account not linked yet
+  if (!user) {
+
+    // Check if same email already exists
+    user = await User.findOne({ email });
+
+    if (user) {
+
+      // Link Google account
+      user.googleId = googleId;
+
+      if (!user.avatar && picture) {
+        user.avatar = picture;
+      }
+
+      await user.save();
+
+    } else {
+
+      // Create new Google user
+      user = await User.create({
+        name: name || "Google User",
+        email,
+        googleId,
+        avatar: picture || "",
+      });
+
+    }
+  }
+
+  const token = generateToken(user._id);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      "Google login successful",
+      {
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+        },
+      }
+    )
+  );
 });

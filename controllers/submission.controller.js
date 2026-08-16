@@ -57,14 +57,20 @@ export const submitSolution = async (req, res) => {
         verdict = status;
         break;
       }
-
+      console.log("INPUT:", testCase.input);
+console.log("EXPECTED:", JSON.stringify(testCase.output));
+console.log("ACTUAL:", JSON.stringify(stdout));
       const actual = stdout.trim().replace(/\r\n/g, "\n");
       const expected = testCase.output.trim().replace(/\r\n/g, "\n");
 
-      if (actual !== expected) {
-        verdict = "Wrong Answer";
-        break;
-      }
+      if (expected === "EMPTY") {
+  expected = "";
+}
+
+if (actual !== expected) {
+  verdict = "Wrong Answer";
+  break;
+}
     }
 
     const submission = await Submission.create({

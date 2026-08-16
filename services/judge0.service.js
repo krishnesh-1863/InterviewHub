@@ -1,12 +1,14 @@
 import axios from "axios";
 
-export const runCode = async (source_code, language_id, stdin = "") => {
+export const runCode = async (sourceCode, languageId, stdin = "") => {
   try {
+    console.log("STDIN:");
+    console.log(stdin);
     const response = await axios.post(
       "https://ce.judge0.com/submissions?base64_encoded=false&wait=true",
       {
-        source_code,
-        language_id,
+        source_code: sourceCode,
+        language_id: languageId,
         stdin,
       },
       {
@@ -15,6 +17,7 @@ export const runCode = async (source_code, language_id, stdin = "") => {
         },
       }
     );
+    
 
     return response.data;
   } catch (error) {
@@ -25,4 +28,4 @@ export const runCode = async (source_code, language_id, stdin = "") => {
       error.response?.data?.error || error.message
     );
   }
-}; 
+};

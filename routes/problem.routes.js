@@ -1,4 +1,8 @@
 import express from "express";
+import { getSolvedProblems } from "../controllers/problem.controller.js";
+
+
+
 import {
   createProblem,
   getAllProblems,
@@ -42,6 +46,13 @@ router.delete(
 
 // User
 router.get("/", protect, getAllProblems);
+
+router.get(
+  "/solved",
+  protect,
+  getSolvedProblems
+);
+
 router.get("/:slug", protect, getProblemBySlug);
 
 export default router;

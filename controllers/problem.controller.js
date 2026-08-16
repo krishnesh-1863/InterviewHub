@@ -2,6 +2,7 @@ import Problem from "../models/Problem.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import Submission from "../models/Submission.js";
 
 export const createProblem = asyncHandler(async (req, res) => {
   const {
@@ -147,3 +148,28 @@ export const deleteProblem = asyncHandler(async (req, res) => {
     )
   );
 });
+
+export const getSolvedProblems = async (req, res) => {
+  try {
+
+    const accepted = await Submission.find({
+      user: req.user._id,
+      status: "Accepted",
+    }).select("problem");
+
+    const solved = accepted.map((sub) => sub.problem.toString());
+
+    return res.status(200).json({
+      success: true,
+      data: [...new Set(solved)],
+    });
+
+  } catch (err) {
+
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+
+  }
+};

@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post("/", protect, submitSolution);
 
-router.get("/me", protect, getMySubmissions);
+router.get("/", protect, getMySubmissions);
 
 router.get("/problem/:problemId", protect, getProblemSubmissions);
 
